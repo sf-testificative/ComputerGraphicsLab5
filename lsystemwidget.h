@@ -11,7 +11,6 @@
 struct LSystemLine {
     QLineF line;
     int depth;
-    double r;
 };
 
 class LSystemWidget : public QWidget
@@ -29,16 +28,16 @@ protected:
 
 private:
     QString m_axiom;
-    double m_angle;
-    double m_startAngle;
+    double m_angle = 60.0;
+    double m_startAngle = 90.0;
     QMap<QChar, QString> m_rules;
     QVector<LSystemLine> m_lines;
-    int m_iterations;
-    bool m_random;
-    bool m_loaded;
+    int m_iterations = 4;
+    bool m_random = false;
+    bool m_loaded = false;
 
     void generate();
-    void interpret(const QString &commandString);
+    void interpret(const QString &s);
 };
 
-#endif // LSYSTEMWIDGET_H
+#endif

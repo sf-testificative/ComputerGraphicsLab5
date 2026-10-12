@@ -26,33 +26,36 @@ public:
 private slots:
     void loadLSystemFile();
     void updateLSystem();
-    void generateMidpoint();
-    void resetMidpoint();
+
+    void startMidpoint();
+    void nextMidpointStep();
+    void finishMidpoint();
+
     void clearBezier();
 
 private:
     QTabWidget *m_tabs;
 
-    // L-системы
     LSystemWidget *m_lsystemWidget;
-    QSpinBox *m_lsystemIterations;
-    QCheckBox *m_lsystemRandom;
-    QPushButton *m_lsystemLoadBtn;
+    QSpinBox      *m_lsystemIterations;
+    QCheckBox     *m_lsystemRandom;
+    QPushButton   *m_lsystemLoadBtn;
 
-    // Midpoint
     MidpointWidget *m_midpointWidget;
-    QSlider *m_roughnessSlider;
-    QSpinBox *m_stepsSpinBox;
-    QPushButton *m_generateMidpointBtn;
-    QPushButton *m_resetMidpointBtn;
+    QSlider        *m_roughnessSlider;
+    QLabel         *m_roughnessLabel;
+    QSpinBox       *m_stepsSpinBox;
+    QPushButton    *m_startMidpointBtn;
+    QPushButton    *m_nextStepBtn;
+    QPushButton    *m_finishBtn;
 
-    // Bezier
     BezierWidget *m_bezierWidget;
-    QPushButton *m_bezierClearBtn;
+    QPushButton  *m_bezierClearBtn;
 
     void setupLSystemTab();
     void setupMidpointTab();
     void setupBezierTab();
+    void updateMidpointButtons();
 };
 
 #endif // MAINWINDOW_H
