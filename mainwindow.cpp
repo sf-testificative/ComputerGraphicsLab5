@@ -130,12 +130,9 @@ void MainWindow::setupBezierTab()
     QWidget *tab = new QWidget();
     QVBoxLayout *mainLayout = new QVBoxLayout(tab);
 
-    QLabel *infoLabel = new QLabel("ЛКМ - добавить/переместить точку. ПКМ - удалить точку.");
-    infoLabel->setStyleSheet("font-weight: bold; color: #333;");
-
     m_bezierWidget = new BezierWidget();
+    m_bezierWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    mainLayout->addWidget(infoLabel);
     mainLayout->addWidget(m_bezierWidget, 1);
 
     m_tabs->addTab(tab, "3. Кривые Безье");

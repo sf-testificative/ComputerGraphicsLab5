@@ -8,7 +8,7 @@
 
 LSystemWidget::LSystemWidget(QWidget *parent): QWidget(parent), m_iterations(4), m_random(false), m_loaded(false)
 {
-    setBackgroundRole(QPalette::Base);
+    setBackgroundRole(QPalette::BrightText);
     setAutoFillBackground(true);
     m_axiom = "";
     m_angle = 0.0;

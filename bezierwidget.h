@@ -22,9 +22,9 @@ private:
     int m_draggedIndex = -1;
     QPointF m_dragOffset;
 
+    QPointF controlPoint1(int segmentIndex) const;
+    QPointF controlPoint2(int segmentIndex) const;
     void drawBezier(QPainter &painter);
-    QPointF getControlPoint1(int i) const;
-    QPointF getControlPoint2(int i) const;
 };
 
 #endif // BEZIERWIDGET_H
