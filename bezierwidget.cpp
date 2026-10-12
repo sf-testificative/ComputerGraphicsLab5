@@ -157,6 +157,7 @@ void BezierWidget::paintEvent(QPaintEvent *event)
     }
 
     drawBezierCurve(painter);
+
     painter.setPen(QPen(Qt::red, 2));
     painter.setBrush(Qt::red);
     for (int i = 0; i < m_points.size(); ++i) {
