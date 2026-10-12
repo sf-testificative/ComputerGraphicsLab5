@@ -28,6 +28,7 @@ private slots:
     void updateLSystem();
     void generateMidpoint();
     void resetMidpoint();
+    void clearBezier();
 
 private:
     QTabWidget *m_tabs;
@@ -47,6 +48,7 @@ private:
 
     // Bezier
     BezierWidget *m_bezierWidget;
+    QPushButton *m_bezierClearBtn;
 
     void setupLSystemTab();
     void setupMidpointTab();

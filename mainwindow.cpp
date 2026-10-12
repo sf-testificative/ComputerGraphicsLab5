@@ -9,7 +9,7 @@
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
 {
-    setWindowTitle("Lab 5");
+    setWindowTitle("Лабораторная работа: Фракталы и кривые");
     resize(1000, 800);
 
     m_tabs = new QTabWidget(this);
@@ -29,6 +29,7 @@ void MainWindow::setupLSystemTab()
     QHBoxLayout *controlsLayout = new QHBoxLayout();
 
     m_lsystemWidget = new LSystemWidget();
+    m_lsystemWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     m_lsystemLoadBtn = new QPushButton("Загрузить L-систему");
     m_lsystemIterations = new QSpinBox();
@@ -44,7 +45,7 @@ void MainWindow::setupLSystemTab()
     controlsLayout->addStretch();
 
     mainLayout->addLayout(controlsLayout);
-    mainLayout->addWidget(m_lsystemWidget);
+    mainLayout->addWidget(m_lsystemWidget, 1);
 
     m_tabs->addTab(tab, "1. L-системы");
 
@@ -77,6 +78,7 @@ void MainWindow::setupMidpointTab()
     QHBoxLayout *controlsLayout = new QHBoxLayout();
 
     m_midpointWidget = new MidpointWidget();
+    m_midpointWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     m_roughnessSlider = new QSlider(Qt::Horizontal);
     m_roughnessSlider->setRange(1, 100);
@@ -105,7 +107,7 @@ void MainWindow::setupMidpointTab()
     controlsLayout->addStretch();
 
     mainLayout->addLayout(controlsLayout);
-    mainLayout->addWidget(m_midpointWidget);
+    mainLayout->addWidget(m_midpointWidget, 1);
 
     m_tabs->addTab(tab, "2. Midpoint Displacement");
 
@@ -129,11 +131,25 @@ void MainWindow::setupBezierTab()
 {
     QWidget *tab = new QWidget();
     QVBoxLayout *mainLayout = new QVBoxLayout(tab);
+    QHBoxLayout *topLayout = new QHBoxLayout();
+
+    m_bezierClearBtn = new QPushButton("Очистить");
+    m_bezierClearBtn->setFixedWidth(120);
+    m_bezierClearBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    topLayout->addWidget(m_bezierClearBtn);
 
     m_bezierWidget = new BezierWidget();
     m_bezierWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
+    mainLayout->addLayout(topLayout);
     mainLayout->addWidget(m_bezierWidget, 1);
 
     m_tabs->addTab(tab, "3. Кривые Безье");
+
+    connect(m_bezierClearBtn, &QPushButton::clicked, this, &MainWindow::clearBezier);
+}
+
+void MainWindow::clearBezier()
+{
+    m_bezierWidget->clear();
 }
