@@ -5,9 +5,10 @@
 #include <QRandomGenerator>
 #include <QtMath>
 #include <QDebug>
+#include <iostream>
 
 LSystemWidget::LSystemWidget(QWidget *parent) : QWidget(parent) {
-    setBackgroundRole(QPalette::Base);
+    setBackgroundRole(QPalette::BrightText);
     setAutoFillBackground(true);
 }
 
@@ -59,7 +60,7 @@ void LSystemWidget::generate()
     }
     interpret(current);
 }
-#include <iostream>
+
 void LSystemWidget::interpret(const QString &s)
 {
 
@@ -95,9 +96,7 @@ void LSystemWidget::interpret(const QString &s)
     }
     std::cout << "Lines: " << m_lines.size() << std::endl;
     if (!m_lines.isEmpty()) {
-        std::cout << "First: " << m_lines.first().line.x1() << ","
-                  << m_lines.first().line.y1() << " -> "
-                  << m_lines.first().line.x2() << ","
+        std::cout << "First: " << m_lines.first().line.x1() << "," << m_lines.first().line.y1() << " -> " << m_lines.first().line.x2() << ","
                   << m_lines.first().line.y2() << std::endl;
     }
 }
@@ -107,11 +106,6 @@ void LSystemWidget::paintEvent(QPaintEvent *)
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
 
-    if (!m_loaded) {
-        p.setPen(Qt::gray);
-        p.drawText(rect(), Qt::AlignCenter, "Загрузите файл с L-системой");
-        return;
-    }
     if (m_lines.isEmpty()) return;
 
     double minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9;
@@ -128,33 +122,28 @@ void LSystemWidget::paintEvent(QPaintEvent *)
     if (h < 1e-6) h = 1.0;
 
     double margin = 20.0;
-    double scale = qMin((width()  - 2*margin) / w,
-                        (height() - 2*margin) / h);
+    double scale = qMin((width()  - 2*margin) / w, (height() - 2*margin) / h);
     if (scale <= 0) scale = 1.0;
 
     double offX = (width()  - w * scale) / 2.0;
     double offY = (height() - h * scale) / 2.0;
 
     for (auto &l : m_lines) {
-        QPointF p1(offX + (l.line.x1() - minX) * scale,
-                   offY + (maxY - l.line.y1()) * scale);
-        QPointF p2(offX + (l.line.x2() - minX) * scale,
-                   offY + (maxY - l.line.y2()) * scale);
+        QPointF p1(offX + (l.line.x1() - minX) * scale, offY + (maxY - l.line.y1()) * scale);
+        QPointF p2(offX + (l.line.x2() - minX) * scale, offY + (maxY - l.line.y2()) * scale);
 
         double lw = 2.0;
         QColor col = Qt::black;
         if (l.depth > 0) {
             lw = qMax(0.5, 4.0 * qPow(0.7, l.depth));
-            col = QColor(qBound(0, 139 - l.depth*10, 255),
-                         qBound(0,  69 + l.depth*20, 255),
-                         qBound(0,  19 + l.depth*5,  255));
+            col = QColor(qBound(0, 139 - l.depth*10, 255), qBound(0,  69 + l.depth*20, 255), qBound(0,  19 + l.depth*5,  255));
         }
         p.setPen(QPen(col, lw));
         p.drawLine(p1, p2);
 
         p.setPen(Qt::NoPen);
         p.setBrush(Qt::red);
-        const double dotRadius = 3.0;
+        const double dotRadius = 2.0;
         p.drawEllipse(p1, dotRadius, dotRadius);
         p.drawEllipse(p2, dotRadius, dotRadius);
     }

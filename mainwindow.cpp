@@ -6,11 +6,11 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QGroupBox>
+#include <QIntValidator>
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
-    setWindowTitle("Лабораторная работа: Фракталы и кривые");
+    setWindowTitle("Lab 5");
     resize(1000, 800);
 
     m_tabs = new QTabWidget(this);
@@ -38,7 +38,7 @@ void MainWindow::setupLSystemTab()
     m_lsystemIterations->setValue(0);
     m_lsystemIterations->setPrefix("Итераций: ");
 
-    m_lsystemRandom = new QCheckBox("Случайность углов (±45°)");
+    m_lsystemRandom = new QCheckBox("Случайность углов");
 
     controlsLayout->addWidget(m_lsystemLoadBtn);
     controlsLayout->addWidget(m_lsystemIterations);
@@ -51,8 +51,7 @@ void MainWindow::setupLSystemTab()
     m_tabs->addTab(tab, "1. L-системы");
 
     connect(m_lsystemLoadBtn, &QPushButton::clicked, this, &MainWindow::loadLSystemFile);
-    connect(m_lsystemIterations, QOverload<int>::of(&QSpinBox::valueChanged),
-            this, &MainWindow::updateLSystem);
+    connect(m_lsystemIterations, QOverload<int>::of(&QSpinBox::valueChanged), this, &MainWindow::updateLSystem);
     connect(m_lsystemRandom, &QCheckBox::toggled, this, &MainWindow::updateLSystem);
 }
 
@@ -90,7 +89,7 @@ void MainWindow::setupMidpointTab()
     m_roughnessSlider->setFixedWidth(150);
 
     m_roughnessLabel = new QLabel("0.50");
-    connect(m_roughnessSlider, &QSlider::valueChanged, [this](int val) {
+    connect(m_roughnessSlider, &QSlider::valueChanged, this, [this](int val) {
         m_roughnessLabel->setText(QString::number(val / 100.0, 'f', 2));
     });
 
@@ -99,15 +98,30 @@ void MainWindow::setupMidpointTab()
     m_stepsSpinBox->setValue(6);
     m_stepsSpinBox->setPrefix("Всего шагов: ");
 
+    m_seedCheckBox = new QCheckBox("Фиксированный seed:");
+    m_seedLineEdit = new QLineEdit();
+    m_seedLineEdit->setValidator(new QIntValidator(0, 2147483647, this));
+    m_seedLineEdit->setFixedWidth(100);
+    m_seedLineEdit->setEnabled(false);
+
+    connect(m_seedCheckBox, &QCheckBox::toggled, this, [this](bool on) {
+        m_seedLineEdit->setEnabled(on);
+        applySeedSetting();
+    });
+    connect(m_seedLineEdit, &QLineEdit::editingFinished, this, &MainWindow::applySeedSetting);
+
     m_startMidpointBtn = new QPushButton("Начать заново");
-    m_nextStepBtn      = new QPushButton("Следующий шаг");
-    m_finishBtn        = new QPushButton("Пропустить до конца");
+    m_nextStepBtn = new QPushButton("Следующий шаг");
+    m_finishBtn = new QPushButton("Пропустить до конца");
 
     controlsLayout->addWidget(roughLabel);
     controlsLayout->addWidget(m_roughnessSlider);
     controlsLayout->addWidget(m_roughnessLabel);
     controlsLayout->addSpacing(20);
     controlsLayout->addWidget(m_stepsSpinBox);
+    controlsLayout->addSpacing(20);
+    controlsLayout->addWidget(m_seedCheckBox);
+    controlsLayout->addWidget(m_seedLineEdit);
     controlsLayout->addSpacing(20);
     controlsLayout->addWidget(m_startMidpointBtn);
     controlsLayout->addWidget(m_nextStepBtn);
@@ -119,18 +133,29 @@ void MainWindow::setupMidpointTab()
 
     m_tabs->addTab(tab, "2. Midpoint Displacement");
 
-    connect(m_startMidpointBtn, &QPushButton::clicked,
-            this, &MainWindow::startMidpoint);
-    connect(m_nextStepBtn, &QPushButton::clicked,
-            this, &MainWindow::nextMidpointStep);
-    connect(m_finishBtn, &QPushButton::clicked,
-            this, &MainWindow::finishMidpoint);
+    connect(m_startMidpointBtn, &QPushButton::clicked, this, &MainWindow::startMidpoint);
+    connect(m_nextStepBtn, &QPushButton::clicked, this, &MainWindow::nextMidpointStep);
+    connect(m_finishBtn, &QPushButton::clicked, this, &MainWindow::finishMidpoint);
 
     updateMidpointButtons();
 }
 
+void MainWindow::applySeedSetting()
+{
+    bool useSeed = m_seedCheckBox->isChecked();
+    QString text = m_seedLineEdit->text().trimmed();
+
+    if (useSeed && !text.isEmpty()) {
+        quint32 seed = text.toUInt();
+        m_midpointWidget->setSeed(seed, true);
+    } else {
+        m_midpointWidget->setSeed(0, false);
+    }
+}
+
 void MainWindow::startMidpoint()
 {
+    applySeedSetting();
     double R = m_roughnessSlider->value() / 100.0;
     int steps = m_stepsSpinBox->value();
     m_midpointWidget->startNew(R, steps);
@@ -156,26 +181,15 @@ void MainWindow::updateMidpointButtons()
     m_finishBtn->setEnabled(!finished);
 }
 
-// ==================== Вкладка 3: Кривые Безье ====================
 void MainWindow::setupBezierTab()
 {
     QWidget *tab = new QWidget();
     QVBoxLayout *mainLayout = new QVBoxLayout(tab);
-
     QHBoxLayout *topLayout = new QHBoxLayout();
-
-    QLabel *infoLabel = new QLabel(
-        "ЛКМ — добавить/переместить опорную точку. "
-        "ПКМ — удалить. Delete — очистить всё.");
-    infoLabel->setStyleSheet("font-weight: bold; color: #333; padding: 6px;");
-    infoLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
     m_bezierClearBtn = new QPushButton("Очистить");
     m_bezierClearBtn->setFixedWidth(120);
-
-    topLayout->addWidget(infoLabel, 1);
     topLayout->addWidget(m_bezierClearBtn);
-
     m_bezierWidget = new BezierWidget();
     m_bezierWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
@@ -183,9 +197,7 @@ void MainWindow::setupBezierTab()
     mainLayout->addWidget(m_bezierWidget, 1);
 
     m_tabs->addTab(tab, "3. Кривые Безье");
-
-    connect(m_bezierClearBtn, &QPushButton::clicked,
-            this, &MainWindow::clearBezier);
+    connect(m_bezierClearBtn, &QPushButton::clicked, this, &MainWindow::clearBezier);
 }
 
 void MainWindow::clearBezier()
