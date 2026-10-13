@@ -5,6 +5,11 @@
 #include <QVector>
 #include <QPointF>
 
+class QPainter;
+class QMouseEvent;
+class QKeyEvent;
+class QPaintEvent;
+
 class BezierWidget : public QWidget
 {
     Q_OBJECT
@@ -24,13 +29,15 @@ private:
     int m_draggedIndex = -1;
     QPointF m_dragOffset;
 
-    QPointF bezierPoint(const QPointF &P0, const QPointF &P1, const QPointF &P2, const QPointF &P3, double t) const;
-
+    QPointF bezierPoint(const QPointF &p0, const QPointF &p1,
+                        const QPointF &p2, const QPointF &p3, double t) const;
     QPointF controlPoint1(int segmentIndex) const;
     QPointF controlPoint2(int segmentIndex) const;
-
+    int pointAt(const QPointF &position) const;
+    int nearestSegment(const QPointF &position) const;
+    QPointF boundedPoint(const QPointF &position) const;
     void drawPolyline(QPainter &painter);
     void drawBezierCurve(QPainter &painter);
 };
 
-#endif // BEZIERWIDGET_H
+#endif
